@@ -21,4 +21,8 @@ def flatten(src, dst, prefix=''):
         
 #flatten(src='data/train/images/', dst=train_dst)
         
-flatten(src='data/train/masks/', dst=train_dst, prefix='_mask')
+#flatten(src='data/train/masks/', dst=train_dst, prefix='_mask')
+        
+#flatten(src='data/val/images/', dst=val_dst)
+        
+flatten(src='data/val/masks/', dst=val_dst, prefix='_mask')
