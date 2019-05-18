@@ -14,9 +14,11 @@ val_dst = 'data/flat_val/'
 
 def flatten(src, dst, prefix=''):
     for d in tqdm(os.listdir(src)):
-        shutil.copyfile(src + d, dst + d[:-4] + prefix + d[-4:])    
+        d_split = d.split('_')
+        new_d = 'ct_' + d_split[1] + '_' + d_split[2]        
+        shutil.copyfile(src + d, dst + new_d[:-4] + prefix + new_d[-4:])    
         
         
-flatten(src='data/train/images/', dst=train_dst)
+#flatten(src='data/train/images/', dst=train_dst)
         
 flatten(src='data/train/masks/', dst=train_dst, prefix='_mask')
