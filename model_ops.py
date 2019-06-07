@@ -17,12 +17,12 @@ from skimage import io
 from PIL import Image
 
 
-def model_fit(
+def model_fit(    
+    train_images_paths,
+    train_masks_paths,
+    val_images_paths,
+    val_masks_paths,
     table=None,
-    train_images_paths=train_images_paths,
-    train_masks_paths=train_masks_paths,
-    val_images_paths=val_images_paths,
-    val_masks_paths=val_masks_paths,
     _resize=[256, 256],
     norm=255.0,
     batch_size=32,
