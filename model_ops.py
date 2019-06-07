@@ -408,8 +408,8 @@ def model_fit_eval(
                     steps_per_epoch=steps_per_epoch, validation_steps=validation_steps,
                     prefix=prefix, patience=patience
                     )
-
-    eval_table.add_row(model_evaluate(model, norm=norm, _resize=_resize, verbose=verbose))
+    
+    eval_table.add_row(model_evaluate(model, images_paths=val_images_paths, masks_paths=val_masks_paths, norm=norm, _resize=_resize, verbose=verbose))
     print(eval_table)
     pred = None
     if rows_to_print is not None:
