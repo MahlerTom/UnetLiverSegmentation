@@ -22,3 +22,6 @@ def prepare_tumor(y_true, y_pred):
     y_pred_tumor = replace_tensor(y_pred_tumor, 0.5, 0.0)
     y_true_tumor = replace_tensor(y_true, 0.5, 0.0)
     return y_true_tumor, y_pred_tumor
+
+def image_name(path):
+    return path.split('/')[-1][:-4]
