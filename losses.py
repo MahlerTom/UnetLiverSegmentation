@@ -1,3 +1,6 @@
+# The model is defined with the *loss* of 1-Dice coef total. We use this loss definition because it enables the training process find hidden features of liver and lesions simultaneously. This loss decrements improves the segmentation task each epoch.
+# *Note:* matrices scores are calculated with quantified predicted images.
+
 from metrics import dice_coef, dice_coef_tumor, dice_coef_liver
 from utils import replace_tensor
 

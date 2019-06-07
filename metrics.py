@@ -1,3 +1,17 @@
+## Define metrices and loss function
+# 
+# We define the following **metrices scores** regarding our model, to evaluate the quality of the results:
+# 
+# *   Dice coef total - dice coefficient score for both liver and lesions segmentation.
+# *   Dice coef liver - dice coefficient score for liver segmentation only.
+# *   Presicion liver - Precision score for liver segmentation only.
+# *   Recall liver - Recall score for liver segmentation only.
+# *   Dice coef lesions - dice coefficient score for lesions segmentation only.
+# *   Presicion lesions - Precision score for lesions segmentation only.
+# *   Recall lesions - Recall score for lesions segmentation only.
+# 
+# *Note:* metrices scores are calculated with quantized predicted images.
+
 from utils import prepare_liver, prepare_tumor
 
 from tensorflow.keras.metrics import Precision, Recall
