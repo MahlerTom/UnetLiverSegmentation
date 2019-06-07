@@ -1,6 +1,3 @@
-from .model_ops import model_predict
-
-import os
 import tensorflow as tf
 
 def quantizatize(img, q, scale, isfloat=True):
