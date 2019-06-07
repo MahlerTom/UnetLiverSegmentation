@@ -1,6 +1,6 @@
 from .model import unet
 from .losses import dice_coef_loss
-from .metrics import dice_coef, dice_coef_liver, dice_coef_tumor
+from .metrics import dice_coef, dice_coef_liver, dice_coef_tumor, dice_coef_np
 from .data import init_ds, image_name
 from .utils import quantizatize
 
@@ -15,6 +15,10 @@ from numpy.random import seed
 import matplotlib.pyplot as plt
 from skimage import io
 from PIL import Image
+from skimage.transform import resize
+from sklearn.metrics import precision_score, recall_score
+from prettytable import MSWORD_FRIENDLY
+
 
 
 def model_fit(    
@@ -178,6 +182,81 @@ def model_evaluate(model, images_paths, masks_paths, ds=None, norm=255.0, _resiz
         norm=norm, _resize=_resize, batch_size=1, shuffle=False)    
     return model.evaluate(ds, steps=len(images_paths), verbose=verbose)
 
+def print_model_scores(
+    pred,
+    images_paths,
+    masks_paths,
+    images_to_print=10,
+    model=None,
+    ds=None,
+    steps=None,    
+    verbose=1,
+    smooth=1,
+    norm=255.0,
+    _resize=[256, 256],
+):    
+    if pred is None:
+        if steps is None:
+            steps = len(images_paths),
 
+        ds = init_ds(
+            ds, 
+            images_paths=images_paths, masks_paths=masks_paths, 
+            norm=norm, _resize=_resize, batch_size=1, shuffle=False)
 
+        pred = model.predict(ds, verbose=verbose, steps=steps)
+        print(pred.shape)
+    
+    splt = 1
+    num_of_splt = 6
+    plt.figure(figsize=(num_of_splt*6, images_to_print*6))
+    for i in range(images_to_print):
+        y_pred = quantizatize(np.squeeze(pred[i,:,:,:]), 3, 170)
+        y_true = io.imread(masks_paths[i], as_gray=True)
+        y_true = resize(y_true, (256, 256))
+        y_true = quantizatize(np.squeeze(y_true), 2, 254)
 
+        y_pred_liver = y_pred.copy()
+        y_pred_liver[y_pred_liver==1] = 0
+        y_true_liver = y_true.copy()
+        y_true_liver[y_true_liver==1] = 0
+
+        y_pred_tumor = y_pred.copy()
+        y_pred_tumor[y_pred_tumor==0.5] = 0
+        y_true_tumor = y_true.copy()
+        y_true_tumor[y_true_tumor==0.5] = 0
+
+        plt.subplot(images_to_print, num_of_splt, splt)
+        plt.imshow(y_pred, cmap='gray', vmin=0, vmax=1)
+        plt.title(f'{i} y_pred {dice_coef_np(y_true, y_pred, smooth=smooth)}')
+        plt.grid(False); plt.xticks([]); plt.yticks([])
+
+        plt.subplot(images_to_print, num_of_splt, splt+1)
+        plt.imshow(y_true, cmap='gray', vmin=0, vmax=1)
+        plt.title(f'{i} y_true')
+        plt.grid(False); plt.xticks([]); plt.yticks([])
+
+        plt.subplot(images_to_print, num_of_splt, splt+2)
+        plt.imshow(y_pred_liver, cmap='gray', vmin=0, vmax=1)
+        plt.title(f'{i} y_pred_liver {dice_coef_np(y_true_liver, y_pred_liver, smooth=smooth)}')
+        plt.grid(False); plt.xticks([]); plt.yticks([])
+
+        plt.subplot(images_to_print, num_of_splt, splt+3)
+        plt.imshow(y_true_liver, cmap='gray', vmin=0, vmax=1)
+        plt.title(f'{i} y_true_liver')
+        plt.grid(False); plt.xticks([]); plt.yticks([])
+
+        plt.subplot(images_to_print, num_of_splt, splt+4)
+        plt.imshow(y_pred_tumor, cmap='gray', vmin=0, vmax=1)
+        plt.title(f'{i} y_pred_tumor {dice_coef_np(y_true_tumor, y_pred_tumor, smooth=smooth)}')
+        plt.grid(False); plt.xticks([]); plt.yticks([])
+
+        plt.subplot(images_to_print, num_of_splt, splt+5)
+        plt.imshow(y_true_tumor, cmap='gray', vmin=0, vmax=1)
+        plt.title(f'{i} y_true_tumor')
+        plt.grid(False); plt.xticks([]); plt.yticks([])
+
+        splt += num_of_splt
+    
+    plt.show()
+    return pred
