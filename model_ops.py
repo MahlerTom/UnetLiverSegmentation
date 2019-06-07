@@ -19,8 +19,6 @@ from skimage.transform import resize
 from sklearn.metrics import precision_score, recall_score
 from prettytable import MSWORD_FRIENDLY
 
-
-
 def model_fit(    
     train_images_paths,
     train_masks_paths,
@@ -47,8 +45,6 @@ def model_fit(
     patience=3,
     _seed=2,
 ):  
-    seed(_seed)
-    set_seed(_seed)
     start_time = time.time()
     input_shape = (_resize[0], _resize[1], 1)
     optimizer = Adam(lr=lr)
@@ -367,3 +363,60 @@ def print_model_score_table(
         ])
     print(); print(); print(score_table)
     return pred
+
+def model_fit_eval(
+    score_table,
+    eval_table,
+    model_table,
+    train_images_paths,
+    train_masks_paths,
+    val_images_paths,
+    val_masks_paths,
+    _resize=[256, 256],
+    norm=255.0,
+    batch_size=32,
+    filters=4,
+    lr=1e-3,
+    epochs=50,
+    loss=dice_coef_loss,
+    metrics=None,
+    verbose=1, 
+    shuffle=True,
+    patience=3,
+    pretrained_weights=None,
+    train_ds=None,
+    val_ds=None,
+    callbacks=None,
+    steps_per_epoch=None,
+    validation_steps=None,
+    prefix='',
+    pred_images_to_print=0,
+    rows_to_print=None,
+    smooth=0,
+    print_model_scores_images=0,
+    random_seed=2,
+):
+    seed(random_seed)
+    set_seed(random_seed)
+    model, _ = model_fit(table=model_table, train_images_paths=train_images_paths,
+                    train_masks_paths=train_masks_paths, val_images_paths=val_images_paths,
+                    val_masks_paths=val_masks_paths, _resize=_resize, norm=norm,
+                    batch_size=batch_size, filters=filters, lr=lr, epochs=epochs,
+                    loss=loss, metrics=metrics, verbose=verbose, shuffle=shuffle,
+                    pretrained_weights=pretrained_weights, train_ds=train_ds,
+                    val_ds=val_ds, callbacks=callbacks,
+                    steps_per_epoch=steps_per_epoch, validation_steps=validation_steps,
+                    prefix=prefix, patience=patience
+                    )
+
+    eval_table.add_row(model_evaluate(model, norm=norm, _resize=_resize, verbose=verbose))
+    print(eval_table)
+    pred = None
+    if rows_to_print is not None:
+        pred = model_predict(model, images_to_print=pred_images_to_print)
+        print_model_score_table(score_table=score_table, pred=pred, rows_to_print=rows_to_print, smooth=smooth)
+
+        if print_model_scores_images > 0:
+            print_model_scores(pred=pred, images_to_print=print_model_scores_images, smooth=smooth)
+
+    return model, pred 
