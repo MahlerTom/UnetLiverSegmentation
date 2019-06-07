@@ -70,7 +70,7 @@ def prepare_ds(ds, batch_size, buffer_size, shuffle=True):
     ds = ds.prefetch(buffer_size=AUTOTUNE)
     return ds
 
-def init_ds(ds, images_paths=val_images_paths, masks_paths=val_masks_paths, norm=255.0, _resize=[256, 256], batch_size=1, buffer_size=None, shuffle=True, verbose=0):
+def init_ds(ds, images_paths, masks_paths, norm=255.0, _resize=[256, 256], batch_size=1, buffer_size=None, shuffle=True, verbose=0):
     if ds is None:
         if buffer_size is None:
             buffer_size = len(images_paths)
