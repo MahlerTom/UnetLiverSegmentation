@@ -45,3 +45,41 @@ def create_ds(image_paths, mask_paths, norm=None, _resize=None, AUTOTUNE=tf.data
         num_parallel_calls=AUTOTUNE
     )
     return label_ds
+
+
+## Basic dataset munipulations before training
+# To train the model with this dataset we will decide:
+# 
+# *   If and how to shuffle the data.
+# *   How to divide to batches.
+# 
+# Furthermore, we will want the training process:
+# *   To be repeatable over the the dataset.
+# *   To make the batches available for training as soon as possible.
+# 
+# These features can be easily added using the `tf.data` api.
+
+def prepare_ds(ds, batch_size, buffer_size, shuffle=True):
+    # Setting a shuffle buffer size as large as the dataset ensures that the data is completely shuffled.
+    if shuffle:
+        ds = ds.shuffle(buffer_size=buffer_size)
+    ds = ds.repeat()
+    ds = ds.batch(batch_size=batch_size)
+
+    # `prefetch` lets the dataset fetch batches, in the background while the model is training.
+    ds = ds.prefetch(buffer_size=AUTOTUNE)
+    return ds
+
+def init_ds(ds, images_paths=val_images_paths, masks_paths=val_masks_paths, norm=255.0, _resize=[256, 256], batch_size=1, buffer_size=None, shuffle=True, verbose=0):
+    if ds is None:
+        if buffer_size is None:
+            buffer_size = len(images_paths)
+        if masks_paths is None:
+            ds = create_image_ds(images_paths, norm=norm, _resize=_resize)
+    else:
+        ds = create_ds(images_paths, masks_paths, norm=norm, _resize=_resize)
+    ds = prepare_ds(ds, batch_size=batch_size, buffer_size=buffer_size, shuffle=shuffle)
+        
+    if verbose > 0:
+        print(ds)
+    return ds
