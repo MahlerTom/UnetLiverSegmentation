@@ -171,9 +171,13 @@ def model_predict(
     plt.show()
     return pred
 
-def model_evaluate(model, ds=None, images_paths=val_images_paths, masks_paths=val_masks_paths, norm=255.0, _resize=[256,256], verbose=1): 
+def model_evaluate(model, images_paths, masks_paths, ds=None, norm=255.0, _resize=[256,256], verbose=1): 
     ds = init_ds(
         ds, 
         images_paths=images_paths, masks_paths=masks_paths, 
         norm=norm, _resize=_resize, batch_size=1, shuffle=False)    
     return model.evaluate(ds, steps=len(images_paths), verbose=verbose)
+
+
+
+
