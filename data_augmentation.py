@@ -1,4 +1,4 @@
-from .utils import image_name
+from .data import image_name
 
 import tensorflow as tf
 import numpy as np
