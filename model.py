@@ -1,5 +1,6 @@
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Dropout, UpSampling2D, concatenate
+from tensorflow.keras.optimizers import Adam
 
 def unet(pretrained_weights=None, shape=(256, 256, 1), filters=64, optimizer=Adam(lr=1e-4), loss='binary_crossentropy', metrics=['accuracy']):
     # First 3 layers
