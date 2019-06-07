@@ -260,12 +260,12 @@ def print_model_scores(
 def print_model_score_table(
     score_table,
     pred,
+    images_paths,
+    masks_paths,
     rows_to_print=0,
     model=None,
     ds=None,
-    steps=None,
-    images_paths=val_images_paths,
-    masks_paths=val_masks_paths,
+    steps=None,    
     norm=255.0,
     _resize=[256, 256], # _resize=[128, 128]
     verbose=1,
