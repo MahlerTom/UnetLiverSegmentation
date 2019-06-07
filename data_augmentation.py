@@ -1,4 +1,4 @@
-from .data import image_name
+from .data import image_name, create_ds, prepare_ds
 
 import tensorflow as tf
 import numpy as np
@@ -88,3 +88,15 @@ def zoom(x, seed=None):
 
 def apply_da(ds, f):
     return ds.map(lambda x,y: (tf.clip_by_value(f(x), 0, 1), tf.clip_by_value(f(y), 0, 1)), num_parallel_calls=4)
+
+def get_train_da(images_paths=train_images_paths, masks_paths=train_masks_paths, max_delta=0.1, norm=255.0, _resize=[256, 256], batch_size=32, shuffle=True):
+  ds_original = create_ds(images_paths, masks_paths, norm=norm, _resize=_resize)
+  ds_rotate = apply_da(create_ds(images_paths, masks_paths, norm=norm, _resize=_resize), lambda x: rotate(x))
+  ds_color = apply_da(create_ds(images_paths, masks_paths, norm=norm, _resize=_resize), lambda x: color(x, max_delta=max_delta))
+  
+  ds_da = ds_original.concatenate(ds_rotate).concatenate(ds_color)
+#   plot_images(ds_da, n_images=5)
+  ds_da_size = 3*len(images_paths)
+  ds_da = prepare_ds(ds_da, batch_size=batch_size, buffer_size=ds_da_size, shuffle=shuffle)
+#   print(train_ds_da_size, train_ds_da)
+  return ds_da, ds_da_size
