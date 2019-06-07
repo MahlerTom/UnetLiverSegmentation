@@ -77,10 +77,10 @@ def init_ds(ds, images_paths, masks_paths, norm=255.0, _resize=[256, 256], batch
             buffer_size = len(images_paths)
         if masks_paths is None:
             ds = create_image_ds(images_paths, norm=norm, _resize=_resize)
-    else:
-        ds = create_ds(images_paths, masks_paths, norm=norm, _resize=_resize)
-    ds = prepare_ds(ds, batch_size=batch_size, buffer_size=buffer_size, shuffle=shuffle)
-        
-    if verbose > 0:
-        print(ds)
+        else:
+            ds = create_ds(images_paths, masks_paths, norm=norm, _resize=_resize)
+        ds = prepare_ds(ds, batch_size=batch_size, buffer_size=buffer_size, shuffle=shuffle)
+            
+        if verbose > 0:
+            print(ds)
     return ds
