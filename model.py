@@ -1,3 +1,11 @@
+# To create segmentation masks of liver and lesions for CT scans, we will use the U-net network, a state-of-the-art network aimed for segmentation tasks, with few variations.
+#
+# The U-net architecture, presented in \Cref{fig:u-net architecture}, contains two paths:
+# 1. First path is the contraction path (also called as the encoder). It is used to capture the context in the image. The encoder is constructed from CNN and max-pooling layers.
+# 2. The second path is the symmetric expanding path (also called as the decoder). It is used to enable precise localization using transposed convolutions.
+#
+# ![alt text](https://github.com/zhixuhao/unet/raw/master/img/u-net-architecture.png "U-net architecture")
+
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Dropout, UpSampling2D, concatenate
 from tensorflow.keras.optimizers import Adam
