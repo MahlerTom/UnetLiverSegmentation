@@ -31,6 +31,7 @@ def load_data(data_path, print_imgs=3, width=256, height=256):
 def image_name(path):
     return path.split('/')[-1][:-4]
 
+# Using `tf.data.Dataset.from_tensor_slices`
 def create_image_ds(image_paths, norm=None, _resize=None, AUTOTUNE=tf.data.experimental.AUTOTUNE):
     path_ds = tf.data.Dataset.from_tensor_slices(image_paths)
     image_ds = path_ds.map(

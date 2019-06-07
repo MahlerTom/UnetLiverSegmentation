@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+#Normalize to 1 grayscale values, and resize images
 def preprocess_image(img_raw, norm=None, _resize=None):
     # Decode png image into grayscale (channels = 1)
     img_tensor = tf.image.decode_png(img_raw, channels=1)
