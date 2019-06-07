@@ -260,3 +260,110 @@ def print_model_scores(
     
     plt.show()
     return pred
+
+def print_model_score_table(
+    score_table,
+    pred,
+    rows_to_print=0,
+    model=None,
+    ds=None,
+    steps=None,
+    images_paths=val_images_paths,
+    masks_paths=val_masks_paths,
+    norm=255.0,
+    _resize=[256, 256], # _resize=[128, 128]
+    verbose=1,
+    smooth=1
+):
+    def format_score(score):
+        return f'{score*100:.2f}'
+    
+    def print_if_valid(y_true, y_pred, _dice_coef_avg, _precision_avg, _recall_avg, _sum):
+        _dice_coef = _precision = _recall = ''
+        if len(np.unique(y_true)) > 1:
+            _dice_coef_num = dice_coef_np(y_true, y_pred, smooth=smooth)
+            _dice_coef = format_score(_dice_coef_num)
+            _dice_coef_avg += _dice_coef_num
+
+            _precision_num = precision_score(y_true, y_pred)
+            _precision = format_score(_precision_num)
+            _precision_avg += _precision_num
+
+            _recall_num = recall_score(y_true, y_pred)
+            _recall = format_score(_recall_num)        
+            _recall_avg += _recall_num
+
+            _sum += 1
+
+        return _dice_coef, _precision, _recall, _dice_coef_avg, _precision_avg, _recall_avg, _sum  
+  
+  
+    if rows_to_print == 0:
+        rows_to_print = len(images_paths)
+    if pred is None:
+        if steps is None:
+            steps = len(images_paths),
+
+        ds = init_ds(
+            ds, 
+            images_paths=images_paths, masks_paths=masks_paths, 
+            norm=norm, _resize=_resize, batch_size=1, shuffle=False)
+
+        pred = model.predict(ds, verbose=verbose, steps=steps)
+        print(pred.shape)
+    
+    t = PrettyTable(['ID', 'Image', 
+                    'Dice All', 
+    #                    'Percision All', 'Recall All',
+                    'Dice Liver', 'Percision Liver', 'Recall Liver', 
+                    'Dice Tumor', 'Percision Tumor', 'Recall Tumor',
+                    ])
+    t.set_style(MSWORD_FRIENDLY)
+
+    _dice_coef_liver_avg = _precision_liver_avg = _recall_liver_avg = _liver_sum = 0
+    _dice_coef_tumor_avg = _precision_tumor_avg = _recall_tumor_avg = _tumor_sum = 0
+    for i in range(len(images_paths)):
+        y_pred = np.squeeze(pred[i,:,:,:])
+        y_pred_qf = quantizatize(y_pred, 3, 170).flatten()*2
+        y_true = np.squeeze(resize(io.imread(masks_paths[i], as_gray=True), (256, 256)))
+        y_true_qf = quantizatize(y_true, 2, 254).flatten()*2
+
+        y_pred_qf_liver = y_pred_qf.copy()
+        y_pred_qf_liver[y_pred_qf_liver==2] = 0
+        y_true_qf_liver = y_true_qf.copy()
+        y_true_qf_liver[y_true_qf_liver==2] = 0
+
+        y_pred_qf_tumor = y_pred_qf.copy()
+        y_pred_qf_tumor[y_pred_qf_tumor==1] = 0
+        y_pred_qf_tumor[y_pred_qf_tumor==2] = 1
+        y_true_qf_tumor = y_true_qf.copy()
+        y_true_qf_tumor[y_true_qf_tumor==1] = 0
+        y_true_qf_tumor[y_true_qf_tumor==2] = 1
+
+            
+        _dice_coef_liver, _precision_liver, _recall_liver, _dice_coef_liver_avg, _precision_liver_avg, _recall_liver_avg, _liver_sum = print_if_valid(y_true_qf_liver, y_pred_qf_liver, _dice_coef_liver_avg, _precision_liver_avg, _recall_liver_avg, _liver_sum)
+        _dice_coef_tumor, _precision_tumor, _recall_tumor, _dice_coef_tumor_avg, _precision_tumor_avg, _recall_tumor_avg, _tumor_sum = print_if_valid(y_true_qf_tumor, y_pred_qf_tumor, _dice_coef_tumor_avg, _precision_tumor_avg, _recall_tumor_avg, _tumor_sum)
+
+        if i < rows_to_print:
+            t.add_row([
+                i+1, image_name(images_paths[i]),
+                format_score(dice_coef_np(y_true_qf, y_pred_qf, smooth=smooth)),
+        #         precision_score(y_true_qf, y_pred_qf, average='weighted'), recall_score(y_true_qf, y_pred_qf, average='weighted'),
+        #         precision_score(y_true_qf, y_pred_qf, average='weighted', sample_weight=[0, .5, .5]), recall_score(y_true_qf, y_pred_qf, average='weighted', sample_weight=[0, .5, .5]),
+                _dice_coef_liver, _precision_liver, _recall_liver,
+                _dice_coef_tumor, _precision_tumor, _recall_tumor
+            ])
+    print(t)
+  
+    with np.errstate(divide='ignore', invalid='ignore'):
+        score_table.add_row([
+            np.divide(_dice_coef_liver_avg, _liver_sum),
+            np.divide(_precision_liver_avg, _liver_sum),
+            np.divide(_recall_liver_avg, _liver_sum),
+
+            np.divide(_dice_coef_tumor_avg, _tumor_sum),
+            np.divide(_precision_tumor_avg, _tumor_sum),
+            np.divide(_recall_tumor_avg, _tumor_sum)
+        ])
+    print(); print(); print(score_table)
+    return pred
