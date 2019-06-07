@@ -12,7 +12,7 @@
 # 
 # *Note:* metrices scores are calculated with quantized predicted images.
 
-from utils import prepare_liver, prepare_tumor
+from .utils import prepare_liver, prepare_tumor
 
 from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.keras import backend as K
