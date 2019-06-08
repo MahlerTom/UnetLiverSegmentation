@@ -7,7 +7,7 @@ from .utils import quantizatize
 import datetime
 import time
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import TensorBoard, EarlyStopping
+from tensorflow.keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
 from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.random import set_seed
 import numpy as np
@@ -89,11 +89,14 @@ def model_fit(
             histogram_freq=1,
         )
         early_stop = EarlyStopping(patience=patience, verbose=verbose)
-
+        mc = ModelCheckpoint(f'{run_name}.h5', verbose=0, save_best_only=True, save_weights_only=True)
+        
         if callbacks is None:
             callbacks = []
         callbacks.append(tensorboard_callback)
         callbacks.append(early_stop)
+        callbacks.append(mc)
+
         model.fit(
             train_ds,
             epochs=epochs,
@@ -104,7 +107,7 @@ def model_fit(
             validation_steps=validation_steps,
             shuffle=shuffle
         )  
-        model.save_weights(f'{run_name}.h5')
+        # model.save_weights(f'{run_name}.h5')
     print(f'--- {(time.time() - start_time):.2f} seconds ---')
     return model, table
 
