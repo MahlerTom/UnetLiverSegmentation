@@ -4,15 +4,17 @@ from .metrics import dice_coef, dice_coef_liver, dice_coef_tumor, dice_coef_np
 from .data import init_ds, image_name
 from .utils import quantizatize
 
+import os
 import datetime
 import time
+import matplotlib.pyplot as plt
+import numpy as np
+
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
 from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.random import set_seed
-import numpy as np
 from numpy.random import seed
-import matplotlib.pyplot as plt
 from skimage import io
 from PIL import Image
 from skimage.transform import resize

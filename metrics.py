@@ -14,9 +14,10 @@
 
 from .utils import prepare_liver, prepare_tumor
 
+import numpy as np
+
 from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.keras import backend as K
-import numpy as np
 
 def dice_coef_f(y_true_f, y_pred_f, smooth=1, K=K):
     """
