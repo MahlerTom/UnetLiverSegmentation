@@ -1,6 +1,6 @@
 # LiverSegmentation Project
 
-In this project we implemnt a U-Net convolutional neural network in `Tensorflow 2.0` and `keras`, inspired by [U-Net: Convolutional Networks for Biomedical Image Segmentation](https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/ "U-Net: Convolutional Networks for Biomedical Image Segmentation"). Our implementation is based on [zhixuhao/unet](https://github.com/zhixuhao/unet "zhixuhao/unet"). Our implementation is contained within the [LiverSegmentationReport Jupyter Notebook](../blob/master/LiverSegmentationReport.ipynb "LiverSegmentationReport").
+In this project we implemented a U-Net convolutional neural network in `Tensorflow 2.0` and `keras`, inspired by [U-Net: Convolutional Networks for Biomedical Image Segmentation](https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/ "U-Net: Convolutional Networks for Biomedical Image Segmentation"). Our implementation is based on [zhixuhao/unet](https://github.com/zhixuhao/unet "zhixuhao/unet"). Our implementation is contained within the [LiverSegmentationReport Jupyter Notebook](../blob/master/LiverSegmentationReport.ipynb "LiverSegmentationReport").
 
 ## Introduction
 
